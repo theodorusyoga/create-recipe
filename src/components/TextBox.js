@@ -1,27 +1,23 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSquarePlus } from "@fortawesome/free-solid-svg-icons";
+import React from "react";
 
-const TextBox = () => {
-  return (
-    <div className="grid grid-cols-8">
-      <div className="px-5 pb-4 col-span-7">
-        <input
-          class="font-sans font-extrabold shadow bg-gray-200 appearance-none rounded w-full py-2 px-3 text-grey focus:outline-none focus:shadow-outline"
-          id="username"
-          type="text"
-          placeholder="Write ingredients..."
-        ></input>
-      </div>
-      <div>
-        <div className="pt-1">
-          <FontAwesomeIcon
-            size="2x"
-            icon={faSquarePlus}
-            style={{ color: "#ff607a" }}
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
+const TextBox = React.forwardRef(({ placeholder, ...props }, ref) => (
+  <div className="flex justify-between px-5">
+    <input
+      className="font-sans font-extrabold shadow bg-gray-700 appearance-none rounded w-full py-2 px-3 mr-3 text-grey focus:outline-none focus:shadow-outline"
+      type="text"
+      placeholder={placeholder}
+      ref={ref}
+      {...props}
+    ></input>
+    <button type="submit" className="pt-1">
+      <FontAwesomeIcon
+        size="2x"
+        icon={faSquarePlus}
+        style={{ color: "#ff607a" }}
+      />
+    </button>
+  </div>
+));
 export default TextBox;

@@ -7,11 +7,13 @@ import Loading from "./components/Loading";
 import EmptyBox from "./assets/empty-box.png";
 import "./App.css";
 
-const API_KEY = "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";
+const API_KEY = "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";
 
 function App() {
   const [ingredients, setIngredients] = useState([]);
   const [isLoading, setLoading] = useState(false);
+  const [isImageLoading, setImageLoading] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
   const [recipe, setRecipe] = useState("");
   const {
     register,
@@ -55,10 +57,11 @@ function App() {
         }
       );
       const { data } = response;
-      const cleanContent = data.choices?.[0]?.message?.content.replace(
-        /\n/g,
-        "<br/>"
-      );
+      const originalContent = data.choices?.[0]?.message?.content;
+      const cleanContent = originalContent.replace(/\n/g, "<br/>");
+      await fetchImage({
+        prompt: originalContent?.split("\n")[0],
+      });
       setRecipe(cleanContent);
     } catch {
       alert("Unknown Error! 🥲");
@@ -67,7 +70,36 @@ function App() {
     }
   };
 
+  const fetchImage = async ({ prompt }) => {
+    setImageLoading(true);
+    const payload = {
+      prompt,
+      n: 2,
+      size: "512x512",
+    };
+    try {
+      const response = await axios.post(
+        "https://api.openai.com/v1/images/generations",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${API_KEY}`,
+          },
+        }
+      );
+      const { data } = response;
+      setImageUrl(data.data?.[0]?.url);
+    } catch {
+      alert("Unknown Error While Loading Image! 🥲");
+    } finally {
+      setImageLoading(false);
+    }
+  };
+
   const resetAll = () => {
+    setImageUrl("");
+    setLoading(false);
+    setImageLoading(false);
     setRecipe("");
     setIngredients([]);
   };
@@ -76,17 +108,24 @@ function App() {
     <div className="container mx-auto sm:border-2 border-red-200 flex flex-col h-screen justify-between">
       <div>
         <div className="bg-red-200 border-red">
-          <p className="font-sans font-light text-4xl subpixel-antialiased text-white pt-8 px-5 leading-normal">
-            What Are You Cooking Today? 👩🏻‍🍳
-          </p>
-          <p className="font-sans text-lg subpixel-antialiased text-white py-4 pb-8 px-5 leading-normal">
-            Put your ingredients and let the AI create a recipe!
-          </p>
-          <div className="container mx-auto bg-white rounded-3xl rounded-b-none">
+          {!imageUrl ? (
+            <>
+              <p className="font-sans font-light text-4xl subpixel-antialiased text-white pt-8 px-5 leading-normal">
+                Hi 👋🏻 I am Mealmashinator 👩🏻‍🍳
+              </p>
+              <p className="font-sans text-lg subpixel-antialiased text-white py-4 pb-14 px-5 leading-normal">
+                What are we cooking today?
+              </p>
+            </>
+          ) : (
+            <img alt="Recipe" src={imageUrl} />
+          )}
+
+          <div className="container mx-auto relative bg-white -mt-6 rounded-3xl rounded-b-none">
             {!recipe && !isLoading && (
               <div>
                 <p className="font-sans text-grey text-md subpixel-antialiased py-8 pb-4 px-5 leading-normal">
-                  Enter your ingredients
+                  Let's input the ingredients you want to cook today (min. 5)
                 </p>
                 <form onSubmit={handleSubmit(onIngredientsSubmit)}>
                   <TextBox
@@ -110,12 +149,14 @@ function App() {
                       <Loading />
                     </div>
                     <p className="font-sans font-center text-lg text-gray-400 subpixel-antialiased py-4 pb-8 px-5 leading-normal">
-                      Preparing awesome recipe for you! 🥳 🤩
+                      {isImageLoading
+                        ? "Step 2. Almost finished! 🥰 Preparing illustration for you... 🖌️💥"
+                        : "Step 1. Preparing awesome recipe for you! 🥳 🤩"}
                     </p>
                   </div>
                 ) : ingredients.length <= 0 ? (
                   <>
-                    <div className="text-center">
+                    <div className="text-center py-12">
                       <img
                         className="mx-auto py-8"
                         alt="Empty"
@@ -144,32 +185,38 @@ function App() {
               </>
             )}
             {!!recipe && (
-              <p
-                className="font-sans font-center text-lg text-gray-400 subpixel-antialiased py-8 px-5 leading-normal"
-                dangerouslySetInnerHTML={{ __html: recipe }}
-              ></p>
+              <div className="px-5 py-8">
+                <button
+                  onClick={resetAll}
+                  className="hover:bg-red-300 rounded-full bg-red-200 text-white text-lg py-3 w-full"
+                >
+                  Start Over 💥
+                </button>
+                <p
+                  className="font-sans font-center text-lg text-gray-400 subpixel-antialiased py-8 px-5 leading-normal"
+                  dangerouslySetInnerHTML={{ __html: recipe }}
+                ></p>
+              </div>
             )}
           </div>
         </div>
       </div>
-      <footer className="px-5 py-4">
-        <button
-          onClick={
-            !!recipe
-              ? () => resetAll()
-              : ingredients.length > 0 && !isLoading
-              ? () => onSubmit()
-              : () => {}
-          }
-          className={`${
-            ingredients.length <= 0 || isLoading
-              ? "opacity-50 cursor-not-allowed "
-              : "hover:bg-red-300 "
-          }rounded-full bg-red-200 text-white text-lg py-3 w-full`}
-        >
-          {!recipe ? "Create Your Recipe Now!" : "Start Over 💥"}
-        </button>
-      </footer>
+      {!recipe && (
+        <footer className="px-5 py-4">
+          <button
+            onClick={
+              ingredients.length > 4 && !isLoading ? () => onSubmit() : () => {}
+            }
+            className={`${
+              ingredients.length <= 4 || isLoading
+                ? "opacity-50 cursor-not-allowed "
+                : "hover:bg-red-300 "
+            }rounded-full bg-red-200 text-white text-lg py-3 w-full`}
+          >
+            Create Your Recipe Now!
+          </button>
+        </footer>
+      )}
     </div>
   );
 }

@@ -48,7 +48,7 @@ function App() {
     };
     try {
       const response = await axios.post(
-        "http://localhost:3001/chats/completions",
+        "https://create-recipe-be.onrender.com/chats/completions",
         payload,
         {
           headers: {
@@ -79,7 +79,7 @@ function App() {
     };
     try {
       const response = await axios.post(
-        "http://localhost:3001/chats/images",
+        "https://create-recipe-be.onrender.com/chats/images",
         payload,
         {
           headers: {
@@ -105,7 +105,7 @@ function App() {
   };
 
   return (
-    <div className="container mx-auto sm:border-2 border-red-200 flex flex-col h-screen justify-between">
+    <div className="container mx-auto sm:border-2 border-red-200 flex flex-col min-h-screen justify-between">
       <div>
         <div className="bg-red-200 border-red">
           {!imageUrl ? (
@@ -118,7 +118,9 @@ function App() {
               </p>
             </>
           ) : (
-            <img alt="Recipe" src={imageUrl} />
+            <div className="max-h-96">
+              <img className="min-w-full" alt="Recipe" src={imageUrl} />
+            </div>
           )}
 
           <div className="container mx-auto relative bg-white -mt-6 rounded-3xl rounded-b-none">

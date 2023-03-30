@@ -18,6 +18,13 @@ module.exports = {
     fontFamily: {
       sans: ['"Noto Sans"', "sans-serif"],
     },
+    screens: {
+      sm: "600px",
+      md: "600px",
+      lg: "600px",
+      xl: "600px",
+      "2xl": "600px",
+    },
     extend: {},
   },
   plugins: [],

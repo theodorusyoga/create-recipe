@@ -111,7 +111,7 @@ function App() {
           {!imageUrl ? (
             <>
               <p className="font-sans font-light text-4xl subpixel-antialiased text-white pt-8 px-5 leading-normal">
-                Hi 👋🏻 I am Mealmashinator 👩🏻‍🍳
+                Hi 👋🏻 I am MealMashinator 👩🏻‍🍳
               </p>
               <p className="font-sans text-lg subpixel-antialiased text-white py-4 pb-14 px-5 leading-normal">
                 What are we cooking today?

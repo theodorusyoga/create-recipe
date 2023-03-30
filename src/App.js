@@ -7,7 +7,7 @@ import Loading from "./components/Loading";
 import EmptyBox from "./assets/empty-box.png";
 import "./App.css";
 
-const API_KEY = "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";
+const API_KEY = "bd7a997a-8762-47fb-92de-b3b88bf4a0ea";
 
 function App() {
   const [ingredients, setIngredients] = useState([]);
@@ -48,7 +48,7 @@ function App() {
     };
     try {
       const response = await axios.post(
-        "https://api.openai.com/v1/chat/completions",
+        "http://localhost:3001/chats/completions",
         payload,
         {
           headers: {
@@ -79,7 +79,7 @@ function App() {
     };
     try {
       const response = await axios.post(
-        "https://api.openai.com/v1/images/generations",
+        "http://localhost:3001/chats/images",
         payload,
         {
           headers: {

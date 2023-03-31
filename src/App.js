@@ -36,20 +36,10 @@ function App() {
   const onSubmit = async () => {
     setLoading(true);
     setRecipe("");
-    const ingredientStr = ingredients.join(", ");
-    const payload = {
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: `give me a recipe that I can make using: ${ingredientStr}`,
-        },
-      ],
-    };
     try {
       const response = await axios.post(
         "https://create-recipe-be.onrender.com/chats/completions",
-        payload,
+        { ingredients },
         {
           headers: {
             Authorization: `Bearer ${API_KEY}`,
@@ -72,15 +62,10 @@ function App() {
 
   const fetchImage = async ({ prompt }) => {
     setImageLoading(true);
-    const payload = {
-      prompt,
-      n: 2,
-      size: "512x512",
-    };
     try {
       const response = await axios.post(
         "https://create-recipe-be.onrender.com/chats/images",
-        payload,
+        { prompt },
         {
           headers: {
             Authorization: `Bearer ${API_KEY}`,
